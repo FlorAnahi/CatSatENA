@@ -125,6 +125,7 @@ for ( int i = 0; i < coordenadasX.size(); i++) {
   
   
   if (i>0){
+    stroke(255, 3, 44);
     strokeWeight(3);
     line(coordenadasX.get(i),coordenadasY.get(i),coordenadasX.get(i-1),coordenadasY.get(i-1));
   }
