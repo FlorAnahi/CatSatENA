@@ -1,12 +1,10 @@
 /*
 CATSAT TRAcKING DE ENA 
-Viridiana N.C 
-Nicole F.
 */
 import googlemapper.*;
 import controlP5.*;
 import processing.serial.*;
-//Insertar libreria
+//INSERTAR BIBLIOTECA
 ControlP5 cp5;
 PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
@@ -110,6 +108,92 @@ coordenadaX01 = width-160;
               .setColorBackground(color(200, 234, 12))
               ;
      
+}
+              
+  
+void draw() {
+background(255,100,100);
+image(mapa,0,0);
+
+CatSatLatitud = CatSatLatitud + random(-0.001, 0.002);
+CatSatLongitud = CatSatLongitud + random(-0.002, 0.001);
+                           //    22.6         21.49
+latitud = map(CatSatLatitud, minLatCatSatY, maxLatCatSatY, 0, altoMapa);
+longitud = map(CatSatLongitud, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
+
+coordenadasX.append(longitud);
+coordenadasY.append(latitud);
+
+for ( int i = 0; i < coordenadasX.size(); i++) {
+  
+  
+  if (i>0){
+    strokeWeight(3);
+    line(coordenadasX.get(i),coordenadasY.get(i),coordenadasX.get(i-1),coordenadasY.get(i-1));
+  }
+  
+}  
+
+
+fill(255);
+ellipse(longitud, latitud, 30, 30);
+ // bezier (0, height/2, width/2,x, width/2,height-x, width, height/2);
+  
+  if (valordecadena != null ) {
+    String[] list = split(valordecadena, ','); 
+   // printArray(list);
+    int temperatura = int(list[1]);
+    println("temperatura: " + temperatura);
+     perilladeTemp.setValue(temperatura);
+    int humedad = int(list[2]);
+    println("humedad: " + humedad);
+    int  press= int(list[3]);
+     perilladeHumedad.setValue(humedad);
+    println("presión: " + press);
+     perilladeBarometro.setValue(press);
+    int  temperatura2= int(list[4]);
+    println("temperatura y presion: " + temperatura2);
+     perilladeTemp2.setValue(temperatura2);
+    int  mx= int(list[5]);
+    println("magnetómetro x: " + mx);
+    int  my= int(list[6]);
+    println("magnetómetro y: " + my);
+    int  mz= int(list[7]);
+    println("magnetómetro z: " + mz);
+    int  ax= int(list[8]);
+    println("aceleración x: " + ax);
+    int  ay= int(list[9]);
+    println("aceleración y: " + ay);
+    int az = int(list[10]);
+    println("aceleración z: " + az);
+    int  gx= int(list[11]);
+    println("giroscopio x: " + gx);
+    int  gy= int(list[12]);
+    println("giroscopio y: " + gy);
+    int  gz= int(list[13]);
+    println("giroscopio z: " + gz);
+    int  latitud= int(list[14]);
+    println("latitud: " + latitud);
+    int  longitud= int(list[15]);
+    println("longitud: " + longitud);
+    
+  }
+  
+}
+
+
+
+
+
+    
+void controlEvent(ControlEvent theEvent) {
+}
+
+
+
+void serialEvent(Serial port){  
+  valordecadena = ENASerial.readStringUntil('\n');
+  //println(valordecadena);//impresion con salto de linea
 }
               
   
