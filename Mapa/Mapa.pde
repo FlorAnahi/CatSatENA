@@ -6,7 +6,7 @@ Nicole F.
 import googlemapper.*;
 import controlP5.*;
 import processing.serial.*;
-
+//Insertar libreria
 ControlP5 cp5;
 PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
