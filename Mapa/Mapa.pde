@@ -1,12 +1,10 @@
 /*
 CATSAT TRAcKING DE ENA 
-Viridiana N.C 
-Nicole F.
 */
 import googlemapper.*;
 import controlP5.*;
 import processing.serial.*;
-
+//INSERTAR BIBLIOTECA
 ControlP5 cp5;
 PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
@@ -130,7 +128,6 @@ for ( int i = 0; i < coordenadasX.size(); i++) {
   
   
   if (i>0){
-    stroke(255, 3, 44);
     strokeWeight(3);
     line(coordenadasX.get(i),coordenadasY.get(i),coordenadasX.get(i-1),coordenadasY.get(i-1));
   }
