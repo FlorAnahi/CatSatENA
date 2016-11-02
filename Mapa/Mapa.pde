@@ -33,6 +33,9 @@ FloatList coordenadasX;
 FloatList coordenadasY;
 
 float x=0;
+PImage globo;
+PImage globo2;
+float yglobo;
 Knob perilladeTemp;
 Knob perilladeHumedad;
 Knob perilladeBarometro; 
@@ -219,7 +222,9 @@ Longitud = map(mapCenterLon, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
     float Altura = (pow((1013.25 / press), 1/5.257) - 1.0) * (temperatura2 + 273.15)  / 0.0065;
     println(Altura); 
     BarradeAlt.setValue(Altura);
-    
+     yglobo= map(Altura, 1000, 27000, 450, 10);
+    globo2 = loadImage("globo.png");
+    image (globo2, 115, yglobo);
 
     
     coordenadasX.append(LongitudReal);
@@ -236,10 +241,8 @@ for ( int i = 0; i < coordenadasX.size(); i++) {
 }  
 
 stroke(44,56,78);
-fill(255);
-ellipse(LatitudReal,LongitudReal, 30, 30);
- //bezier (0, height/2, width/2,x, width/2,height-x, width, height/2);
-  
+globo = loadImage("globo.png");
+image (globo, LongitudReal, LatitudReal);
 
   }
   /*
