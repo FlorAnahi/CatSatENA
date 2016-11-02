@@ -1,25 +1,28 @@
-/*
-CATSAT TRAcKING DE ENA 
-*/
+
 import googlemapper.*;
 import controlP5.*;
 import processing.serial.*;
-//INSERTAR BIBLIOTECA
+
 ControlP5 cp5;
 PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
 
+//primer intento para graficar el CO2
+float increment = 0.01;
+float zoff = 0.0;
+float zincrement = 0.02;
+
 // Mapa
-float mapCenterLat = 21.8857347;
-float mapCenterLon = -102.2912996;
-int zoomLevel = 10;
+float mapCenterLat = 21.8538187;
+float mapCenterLon = -102.2854984;
+int zoomLevel = 15;
 String mapType = GoogleMapper.MAPTYPE_HYBRID;
-int anchoMapa = 900; //dar informacio para la foto que vamos a necesitar 
+int anchoMapa = 1000; //dar informacio para la foto que vamos a necesitar 
 int altoMapa = 600;
 
 // Satelite CatSat
-float latitud;
-float longitud;
+float Latitud;
+float Longitud;
 float minLatCatSatY;
 float maxLatCatSatY;
 float minLonCatSatX;
@@ -34,6 +37,7 @@ Knob perilladeTemp;
 Knob perilladeHumedad;
 Knob perilladeBarometro; 
 Knob perilladeTemp2;
+Slider BarradeAlt;
 /*leer valores desde puerto serial de Arduino
 fecha: 8 de octubre de 2016
 
@@ -48,13 +52,18 @@ String valordecadena;
 
 void setup(){
   size(1000,600);// creamos ventana de 700 por 400 pixeles
+ 
+ 
   
-  gMapper = new GoogleMapper(mapCenterLat, mapCenterLon, zoomLevel, mapType, anchoMapa, altoMapa);
+ gMapper = new GoogleMapper(mapCenterLat, mapCenterLon, zoomLevel, mapType, anchoMapa, altoMapa);
   mapa = gMapper.getMap();
-  minLatCatSatY = 22.2683885;
-  maxLatCatSatY = 21.4986971;
-  minLonCatSatX = -102.9348029;
-  maxLonCatSatX = -101.6658820;
+  
+  
+ 
+  minLatCatSatY = 21.868097; //22.864707;
+  maxLatCatSatY = 21.844466; //21.838856;
+  minLonCatSatX = -102.309047; //-102.265379;
+  maxLonCatSatX = -102.312018; //-102.321769;
   
   CatSatLatitud = mapCenterLat;
   CatSatLongitud = mapCenterLon;
@@ -63,12 +72,16 @@ void setup(){
   coordenadasY = new FloatList();
   
   printArray(Serial. list());
-   ENASerial= new Serial (this, Serial.list()[0], 9600);//[numero serial] detectar automatico el puerto del arduino A
+   //ENASerial = new Serial (this, Serial.list()[0], 9600);//[numero serial] detectar automatico el puerto del arduino A
    background (200);
    noFill();
    stroke(#663399,25);
    smooth ();
    
+/*
+   fill(255, 0, 0);
+   noStroke();
+  */ 
      cp5 = new ControlP5(this);
 coordenadaX01 = width-160;
      perilladeTemp = cp5.addKnob ("Temperatura")
@@ -107,42 +120,66 @@ coordenadaX01 = width-160;
               .setColorForeground(color(80, 234, 80))
               .setColorBackground(color(200, 234, 12))
               ;
+     BarradeAlt = cp5.addSlider("Altura")
+             .setPosition(50, 30)
+             .setSize(25, 500)
+             .setRange(1000,27000)
+             .setSliderMode(Slider.FLEXIBLE)
+             .setColorForeground(color(0))
+             .setColorBackground(color(255))
+     ;
      
+   {
+
+     frameRate(30);
+   }
 }
               
   
 void draw() {
 background(255,100,100);
-image(mapa,0,0);
-
-CatSatLatitud = CatSatLatitud + random(-0.001, 0.002);
-CatSatLongitud = CatSatLongitud + random(-0.002, 0.001);
-                           //    22.6         21.49
-latitud = map(CatSatLatitud, minLatCatSatY, maxLatCatSatY, 0, altoMapa);
-longitud = map(CatSatLongitud, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
-
-coordenadasX.append(longitud);
-coordenadasY.append(latitud);
-
-for ( int i = 0; i < coordenadasX.size(); i++) {
+//image(mapa,0,0);
+// Optional: adjust noise detail here
+  // noiseDetail(8,0.65f);
   
+  loadPixels();
+
+  float xoff = 0.0; // Start xoff at 0
   
-  if (i>0){
-    strokeWeight(3);
-    line(coordenadasX.get(i),coordenadasY.get(i),coordenadasX.get(i-1),coordenadasY.get(i-1));
+  // For every x,y coordinate in a 2D space, calculate a noise value and produce a brightness value
+  for (int x = 100; x < width/2; x++) {
+    xoff += increment;   // Increment xoff 
+    float yoff = 0.0;   // For every xoff, start yoff at 0
+    for (int y = 60; y < height/2; y++) {
+      yoff += increment; // Increment yoff
+      
+      // Calculate noise and scale by 255
+      float bright = noise(xoff,yoff,zoff)*255;
+
+      // Try using this line instead
+      //float bright = random(0,255);
+      
+      // Set each pixel onscreen to a grayscale value
+      pixels[x+y*width] = color(bright,bright,bright);
+    }
   }
+  updatePixels();
   
-}  
+  zoff += zincrement; // Increment zoff
 
 
-fill(255);
-ellipse(longitud, latitud, 30, 30);
- // bezier (0, height/2, width/2,x, width/2,height-x, width, height/2);
-  
+CatSatLatitud = Latitud ;
+CatSatLongitud =Longitud;
+                           //    22.6         21.49
+Latitud = map(mapCenterLat, minLatCatSatY, maxLatCatSatY, 0, altoMapa);
+Longitud = map(mapCenterLon, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
+
+
+
   if (valordecadena != null ) {
     String[] list = split(valordecadena, ','); 
    // printArray(list);
-    int temperatura = int(list[1]);
+    int temperatura = int (list[1]);
     println("temperatura: " + temperatura);
      perilladeTemp.setValue(temperatura);
     int humedad = int(list[2]);
@@ -172,16 +209,65 @@ ellipse(longitud, latitud, 30, 30);
     println("giroscopio y: " + gy);
     int  gz= int(list[13]);
     println("giroscopio z: " + gz);
-    int  latitud= int(list[14]);
-    println("latitud: " + latitud);
-    int  longitud= int(list[15]);
-    println("longitud: " + longitud);
+    float LatitudReal= float (list[14]);
+    println("latitud: " + LatitudReal);
+    float  LongitudReal= float (list[15]);
+    println("longitud: " + LongitudReal);
+    int MQ2 = int (list[16]); 
+    int MQ135 = int (list [17]); 
     
+    float Altura = (pow((1013.25 / press), 1/5.257) - 1.0) * (temperatura2 + 273.15)  / 0.0065;
+    println(Altura); 
+    BarradeAlt.setValue(Altura);
+    
+
+    
+    coordenadasX.append(LongitudReal);
+    coordenadasY.append(LatitudReal);
+
+for ( int i = 0; i < coordenadasX.size(); i++) {
+  
+  
+  if (i>0){
+    strokeWeight(3);
+    line(coordenadasX.get(i),coordenadasY.get(i),coordenadasX.get(i-1),coordenadasY.get(i-1));
   }
   
+}  
+
+stroke(44,56,78);
+fill(255);
+ellipse(LatitudReal,LongitudReal, 30, 30);
+ //bezier (0, height/2, width/2,x, width/2,height-x, width, height/2);
+  
+
+  }
+  /*
+  {
+    background(0);
+    
+    //iluminacion basica lights ();
+    //Dibujaremos centrado en el (0, 0, 0); translate (width/2, height/2);
+    
+    rotateX(frameCount*PI/60.0);
+    rotateY(frameCount*PI/120.0);
+    rotateZ(frameCount*PI/180.0);
+    box(200, 200, 200);
+  }
+  
+  {
+    loadPixels();
+    
+    float xoff = 0.0; // Start xoff at 0
+    
+  }
+{
+updatePixels();
+
+
+
+   }*/
 }
-
-
 
 
 
