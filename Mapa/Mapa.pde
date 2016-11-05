@@ -8,9 +8,8 @@ PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
 
 //primer intento para graficar el CO2
-float increment = 0.01;
-float zoff = 0.0;
-float zincrement = 0.02;
+float GLP;
+float CO2;
 
 // Mapa
 float mapCenterLat = 21.8538187;
@@ -40,6 +39,8 @@ Knob perilladeTemp;
 Knob perilladeHumedad;
 Knob perilladeBarometro; 
 Knob perilladeTemp2;
+Knob perilladeCO2;
+Knob perilladeGLP;
 Slider BarradeAlt;
 /*leer valores desde puerto serial de Arduino
 fecha: 8 de octubre de 2016
@@ -75,22 +76,18 @@ void setup(){
   coordenadasY = new FloatList();
   
   printArray(Serial. list());
-   //ENASerial = new Serial (this, Serial.list()[0], 9600);//[numero serial] detectar automatico el puerto del arduino A
+   ENASerial = new Serial (this, Serial.list()[0], 9600);//[numero serial] detectar automatico el puerto del arduino A
    background (200);
    noFill();
    stroke(#663399,25);
    smooth ();
-   
-/*
-   fill(255, 0, 0);
-   noStroke();
-  */ 
+
      cp5 = new ControlP5(this);
 coordenadaX01 = width-160;
      perilladeTemp = cp5.addKnob ("Temperatura")
               .setRange(-55, 90)
               .setValue(0)
-              .setPosition(coordenadaX01,40)
+              .setPosition(coordenadaX01,10)
               .setRadius(50)
               .setColorForeground(color(255, 200, 57))
               .setColorBackground(color(255, 0, 0))
@@ -99,7 +96,7 @@ coordenadaX01 = width-160;
      perilladeHumedad = cp5.addKnob ("Humedad")
               .setRange(-55, 90)
               .setValue(0)
-              .setPosition(coordenadaX01,160)
+              .setPosition(coordenadaX01,130)
               .setRadius(50)
               .setColorForeground(color(30, 144, 255))
               .setColorBackground(color(78, 29, 126))
@@ -109,7 +106,7 @@ coordenadaX01 = width-160;
      perilladeBarometro = cp5.addKnob ("Press")
               .setRange(800, 850)
               .setValue(0)
-              .setPosition(coordenadaX01,280)
+              .setPosition(coordenadaX01,250)
               .setRadius(50)
               .setColorForeground(color(0, 144, 70))
               .setColorBackground(color(78, 234, 12))
@@ -118,10 +115,30 @@ coordenadaX01 = width-160;
      perilladeTemp2 = cp5.addKnob ("temperatura y presion")
               .setRange(-55, 90)
               .setValue(0)
-              .setPosition(coordenadaX01,400)
+              .setPosition(coordenadaX01,370)
               .setRadius(50)
               .setColorForeground(color(80, 234, 80))
-              .setColorBackground(color(200, 234, 12))
+              .setColorBackground(color(200, 234, 12)) 
+;
+    
+     cp5 = new ControlP5(this);
+     perilladeGLP = cp5.addKnob ("GLP")
+              .setRange(0, 10000)
+              .setValue(0)
+              .setPosition(730,485)
+              .setRadius(50)
+              .setColorForeground(color(69, 24, 80))
+              .setColorBackground(color(20, 24, 12));
+              
+               cp5 = new ControlP5(this);
+     perilladeCO2 = cp5.addKnob ("CO2")
+              .setRange(0, 200)
+              .setValue(0)
+              .setPosition(coordenadaX01,485)
+              .setRadius(50)
+              .setColorForeground(color(87, 134, 190))
+              .setColorBackground(color(240, 24, 120))
+              
               ;
      BarradeAlt = cp5.addSlider("Altura")
              .setPosition(50, 30)
@@ -140,36 +157,8 @@ coordenadaX01 = width-160;
               
   
 void draw() {
-background(255,100,100);
-//image(mapa,0,0);
-// Optional: adjust noise detail here
-  // noiseDetail(8,0.65f);
-  
-  loadPixels();
-
-  float xoff = 0.0; // Start xoff at 0
-  
-  // For every x,y coordinate in a 2D space, calculate a noise value and produce a brightness value
-  for (int x = 100; x < width/2; x++) {
-    xoff += increment;   // Increment xoff 
-    float yoff = 0.0;   // For every xoff, start yoff at 0
-    for (int y = 60; y < height/2; y++) {
-      yoff += increment; // Increment yoff
-      
-      // Calculate noise and scale by 255
-      float bright = noise(xoff,yoff,zoff)*255;
-
-      // Try using this line instead
-      //float bright = random(0,255);
-      
-      // Set each pixel onscreen to a grayscale value
-      pixels[x+y*width] = color(bright,bright,bright);
-    }
-  }
-  updatePixels();
-  
-  zoff += zincrement; // Increment zoff
-
+background(0);
+image(mapa,0,0);
 
 CatSatLatitud = Latitud ;
 CatSatLongitud =Longitud;
@@ -181,46 +170,76 @@ Longitud = map(mapCenterLon, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
 
   if (valordecadena != null ) {
     String[] list = split(valordecadena, ','); 
-   // printArray(list);
+   //printArray(list);
     int temperatura = int (list[1]);
-    println("temperatura: " + temperatura);
+    //println("temperatura: " + temperatura);
      perilladeTemp.setValue(temperatura);
     int humedad = int(list[2]);
-    println("humedad: " + humedad);
+    //println("humedad: " + humedad);
     int  press= int(list[3]);
      perilladeHumedad.setValue(humedad);
-    println("presión: " + press);
+    //println("presión: " + press);
      perilladeBarometro.setValue(press);
     int  temperatura2= int(list[4]);
-    println("temperatura y presion: " + temperatura2);
+    //println("temperatura y presion: " + temperatura2);
      perilladeTemp2.setValue(temperatura2);
     int  mx= int(list[5]);
-    println("magnetómetro x: " + mx);
+    //println("magnetómetro x: " + mx);
     int  my= int(list[6]);
-    println("magnetómetro y: " + my);
+    //println("magnetómetro y: " + my);
     int  mz= int(list[7]);
-    println("magnetómetro z: " + mz);
+    //println("magnetómetro z: " + mz);
     int  ax= int(list[8]);
-    println("aceleración x: " + ax);
+    //println("aceleración x: " + ax);
     int  ay= int(list[9]);
-    println("aceleración y: " + ay);
+    //println("aceleración y: " + ay);
     int az = int(list[10]);
-    println("aceleración z: " + az);
+    //println("aceleración z: " + az);
     int  gx= int(list[11]);
-    println("giroscopio x: " + gx);
+    //println("giroscopio x: " + gx);
     int  gy= int(list[12]);
-    println("giroscopio y: " + gy);
+    //println("giroscopio y: " + gy);
     int  gz= int(list[13]);
-    println("giroscopio z: " + gz);
+    //println("giroscopio z: " + gz);
     float LatitudReal= float (list[14]);
-    println("latitud: " + LatitudReal);
+    //println("latitud: " + LatitudReal);
     float  LongitudReal= float (list[15]);
-    println("longitud: " + LongitudReal);
-    int MQ2 = int (list[16]); 
-    int MQ135 = int (list [17]); 
+    //println("longitud: " + LongitudReal);
+    int MQ135 = int(list[16]); 
+     println("MQ135:" + MQ135);
+    int MQ2 = int(list[17]);
+    println("M2:" + MQ2);
+    
+  //Sensor MQ135
+float voltaje1 = MQ135 * (3.7 / 1023.0); //Convertimos la lectura en un valor de voltaje
+float Rs1=1000*((3.7-voltaje1)/voltaje1);  //Calculamos Rs con un RL de 1k
+CO2 = 132.01*pow(Rs1/1062, -2.737); // calculamos la concentración  de alcohol con la ecuación obtenida.
+ 
+ 
+ // println("    voltaje:");
+//  println(voltaje1);
+  //println("    Rs:");
+ // println(Rs1);
+  print("CO2:" + CO2);
+  println("ppm");
+ perilladeCO2.setValue(CO2);
+  
+  
+  //Sensor MQ2
+  float voltaje2 = MQ2 * (3.7 / 1023.0); //Convertimos la lectura en un valor de voltaje
+  float Rs2=1000*((3.7-voltaje2)/voltaje2);  //Calculamos Rs con un RL de 1k
+  GLP = 629.05*pow(Rs2/3269, -2.041); // calculamos la concentración  de alcohol con la ecuación obtenida.
+  
+  //println("    voltaje:");
+ // println(voltaje2);
+  //println("    Rs:");
+ // println(Rs2);
+  print("GLP:" +  GLP);
+  println("ppm");
+  perilladeGLP.setValue(GLP);
     
     float Altura = (pow((1013.25 / press), 1/5.257) - 1.0) * (temperatura2 + 273.15)  / 0.0065;
-    println(Altura); 
+    println("Altura" +  Altura); 
     BarradeAlt.setValue(Altura);
      yglobo= map(Altura, 1000, 27000, 450, 10);
     globo2 = loadImage("globo.png");
@@ -245,31 +264,8 @@ globo = loadImage("globo.png");
 image (globo, LongitudReal, LatitudReal);
 
   }
-  /*
-  {
-    background(0);
-    
-    //iluminacion basica lights ();
-    //Dibujaremos centrado en el (0, 0, 0); translate (width/2, height/2);
-    
-    rotateX(frameCount*PI/60.0);
-    rotateY(frameCount*PI/120.0);
-    rotateZ(frameCount*PI/180.0);
-    box(200, 200, 200);
-  }
-  
-  {
-    loadPixels();
-    
-    float xoff = 0.0; // Start xoff at 0
-    
-  }
-{
-updatePixels();
-
-
-
-   }*/
+ 
+  //delay(100);
 }
 
 
