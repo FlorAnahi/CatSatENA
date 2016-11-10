@@ -7,7 +7,7 @@ ControlP5 cp5;
 PImage mapa;
 GoogleMapper gMapper; //codigo de la nueva libreria, busca un mapa, guarda la imagen dependiendo de las coordenadas
 
-//primer intento para graficar el CO2
+//Sensores
 float GLP;
 float CO2;
 
@@ -61,8 +61,8 @@ void setup(){
  
  
   
-//  gMapper = new GoogleMapper(mapCenterLat, mapCenterLon, zoomLevel, mapType, anchoMapa, altoMapa);
-  // mapa = gMapper.getMap();
+gMapper = new GoogleMapper(mapCenterLat, mapCenterLon, zoomLevel, mapType, anchoMapa, altoMapa);
+  mapa = gMapper.getMap();
   
   
  
@@ -162,14 +162,15 @@ coordenadaY02 = height -115;
   
 void draw() {
 background(25, 78,255);
-//image(mapa,0,0);
+image(mapa,0,0);
 
 CatSatLatitud = LatitudReal ;
 CatSatLongitud =LongitudReal;
-                           //    22.6         21.49
+                         
 Latitud = map(mapCenterLat, minLatCatSatY, maxLatCatSatY, 0, altoMapa);
 Longitud = map(mapCenterLon, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
-
+globo = loadImage("globo.png");
+image (globo, Longitud, Latitud);
 
 
   if (valordecadena != null ) {
@@ -254,8 +255,7 @@ CO2 = 132.01*pow(Rs1/1062, -2.737); // calculamos la concentración  de alcohol 
     coordenadasY.append(LatitudReal);
 
 stroke(44,56,78);
-globo = loadImage("globo.png");
-image (globo, Longitud, Latitud);
+
 
 for ( int i = 0; i < coordenadasX.size(); i++) {
   
