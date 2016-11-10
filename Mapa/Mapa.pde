@@ -170,7 +170,7 @@ CatSatLongitud =LongitudReal;
 Latitud = map(mapCenterLat, minLatCatSatY, maxLatCatSatY, 0, altoMapa);
 Longitud = map(mapCenterLon, minLonCatSatX, maxLonCatSatX, 0, anchoMapa);
 globo = loadImage("globo.png");
-image (globo, Longitud, Latitud);
+image (globo, 350, 150);
 
 
   if (valordecadena != null ) {
